@@ -35,10 +35,20 @@ def ceil(x):
     x = x.evaluate() if hasattr(x, 'evaluate') else x
     return math.ceil(x)
 
+def abso(x):
+    x = x.evaluate() if hasattr(x, 'evaluate') else x
+    return abs(x)
+
+cache = {}
 def factorial(x):
+    global cache
     x = x.evaluate() if hasattr(x, 'evaluate') else x
     try:
-        return math.factorial(x)
+        if x in cache:
+            return cache[x]
+        fac = math.factorial(x)
+        cache[x] = fac
+        return fac
     except ValueError:
         raise ZeroDivisionError
 
@@ -53,12 +63,14 @@ CLAUSE_UNARY_OPS = [
     noop,
     floor,
     ceil,
+    abso,
     #factorial
 ]
 
 SINGLE_UNARY_OPS = [
     noop,
     factorial,
+    abso
 ]
 
 SYMBOL_MAP = {

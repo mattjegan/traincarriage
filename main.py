@@ -9,11 +9,12 @@ import itertools
 
 def main():
     stats = [0, 0]
-    workers = 8
+    workers = 40
+    max_num = 10000
     with ProcessPoolExecutor(max_workers=workers) as executor:
         futures = []
         for i in range(0, workers):
-            incr = 10000 // workers
+            incr = max_num // workers
             mini = incr * i
             maxi = mini + incr
             futures.append(executor.submit(calcTrain, mini, maxi))
@@ -21,6 +22,7 @@ def main():
             fstats = f.result()
             stats[True] += fstats[True]
             stats[False] += fstats[False]
+    #stats = calcTrain(0, 10)
     print('True:', stats[True], 'False:', stats[False])
 
 def calcTrain(mini, maxi):
@@ -29,37 +31,45 @@ def calcTrain(mini, maxi):
         seq = getSequence(num)
         sym = operators.SYMBOL_MAP
         x = False
-        for q in itertools.permutations(seq):
-            for i in itertools.product(operators.BINARY_OPS, repeat=3):
-                for u in itertools.product(operators.CLAUSE_UNARY_OPS, repeat=3):
-                    for s in itertools.product(operators.SINGLE_UNARY_OPS, repeat=4):
-                        op1 = i[0]
-                        op2 = i[1]
-                        op3 = i[2]
+        binary_ops = list(itertools.product(operators.BINARY_OPS, repeat=3))
+        clausal_unary_ops = list(itertools.product(operators.CLAUSE_UNARY_OPS, repeat=3))
+        atomic_unary_ops = list(itertools.product(operators.SINGLE_UNARY_OPS, repeat=4))
+        #for q in itertools.permutations(seq):
+        for i in binary_ops:
+            for u in clausal_unary_ops:
+                for s in atomic_unary_ops:
+                    op1 = i[0]
+                    op2 = i[1]
+                    op3 = i[2]
 
-                        s1 = UnaryOperator(s[0]).populate(q[0])
-                        s2 = UnaryOperator(s[1]).populate(q[1])
-                        s3 = UnaryOperator(s[2]).populate(q[2])
-                        s4 = UnaryOperator(s[3]).populate(q[3])
+                    # s1 = UnaryOperator(s[0]).populate(q[0])
+                    # s2 = UnaryOperator(s[1]).populate(q[1])
+                    # s3 = UnaryOperator(s[2]).populate(q[2])
+                    # s4 = UnaryOperator(s[3]).populate(q[3])
 
-                        # s1 = seq[0]
-                        # s2 = seq[1]
-                        # s3 = seq[2]
-                        # s4 = seq[3]
+                    s1 = UnaryOperator(s[0]).populate(seq[0])
+                    s2 = UnaryOperator(s[1]).populate(seq[1])
+                    s3 = UnaryOperator(s[2]).populate(seq[2])
+                    s4 = UnaryOperator(s[3]).populate(seq[3])
 
-                        c1 = BinaryOperator(op1).populate(s1, s2)
-                        c1 = UnaryOperator(u[0]).populate(c1)
-                        c2 = BinaryOperator(op2).populate(c1, s3)
-                        c2 = UnaryOperator(u[1]).populate(c2)
-                        c3 = BinaryOperator(op3).populate(c2, s4)
-                        c3 = UnaryOperator(u[2]).populate(c3)
-                        try:
-                            if c3.evaluate() == 10:
-                                x = True
-                                #printSolution(seq, sym, c3, op1, op2, op3)
-                                break
-                        except ZeroDivisionError:
-                            continue
+                    # s1 = seq[0]
+                    # s2 = seq[1]
+                    # s3 = seq[2]
+                    # s4 = seq[3]
+
+                    c1 = BinaryOperator(op1).populate(s1, s2)
+                    c1 = UnaryOperator(u[0]).populate(c1)
+                    c2 = BinaryOperator(op2).populate(c1, s3)
+                    c2 = UnaryOperator(u[1]).populate(c2)
+                    c3 = BinaryOperator(op3).populate(c2, s4)
+                    c3 = UnaryOperator(u[2]).populate(c3)
+                    try:
+                        if c3.evaluate() == 10:
+                            x = True
+                            #printSolution(seq, sym, c3, op1, op2, op3)
+                            break
+                    except ZeroDivisionError:
+                        continue
 
         print(seq, ' : ', x)
         stats[x] += 1
