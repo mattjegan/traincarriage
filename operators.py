@@ -69,8 +69,7 @@ CLAUSE_UNARY_OPS = [
 
 SINGLE_UNARY_OPS = [
     noop,
-    factorial,
-    abso
+    factorial
 ]
 
 SYMBOL_MAP = {
