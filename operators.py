@@ -63,7 +63,7 @@ CLAUSE_UNARY_OPS = [
     noop,
     floor,
     ceil,
-    abso,
+    #abso,
     #factorial
 ]
 

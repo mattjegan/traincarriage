@@ -9,23 +9,27 @@ import itertools
 
 def main():
     stats = [0, 0]
+    tfails = []
     workers = 40
-    max_num = 10000
-    # with ProcessPoolExecutor(max_workers=workers) as executor:
-    #     futures = []
-    #     for i in range(0, workers):
-    #         incr = max_num // workers
-    #         mini = incr * i
-    #         maxi = mini + incr
-    #         futures.append(executor.submit(calcTrain, mini, maxi))
-    #     for f in as_completed(futures):
-    #         fstats = f.result()
-    #         stats[True] += fstats[True]
-    #         stats[False] += fstats[False]
-    stats = calcTrain(0, 10)
+    max_num = 1000
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        futures = []
+        for i in range(0, workers):
+            incr = max_num // workers
+            mini = incr * i
+            maxi = mini + incr
+            futures.append(executor.submit(calcTrain, mini, maxi))
+        for f in as_completed(futures):
+            fstats, fails = f.result()
+            tfails.extend(fails)
+            stats[True] += fstats[True]
+            stats[False] += fstats[False]
+    #stats = calcTrain(0, 1000)
     print('True:', stats[True], 'False:', stats[False])
+    print('Num Fails': len(fails))
 
 def calcTrain(mini, maxi):
+    fails = []
     stats = [0, 0]
     for num in range(mini, maxi):
         seq = getSequence(num)
@@ -73,9 +77,13 @@ def calcTrain(mini, maxi):
                             continue
 
         print(seq, ' : ', x)
+        if not x:
+            fails.append(seq)
         stats[x] += 1
     print('True:', stats[True], 'False:', stats[False])
-    return stats
+    #print(fails)
+    print("Fails:", len(fails), "Nums:", (maxi-mini))
+    return stats, fails
 
 def printSolution(seq, sym, c3, op1, op2, op3):
     print("(({} {} {}) {} {}) {} {} = {}".format(seq[0], sym[op1], seq[1], sym[op2], seq[2], sym[op3], seq[3], c3.evaluate()))
