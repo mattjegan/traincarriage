@@ -52,18 +52,24 @@ def factorial(x):
     except ValueError:
         raise ZeroDivisionError
 
+def exponent(x, y):
+    x = x.evaluate() if hasattr(x, 'evaluate') else x
+    y = y.evaluate() if hasattr(y, 'evaluate') else y
+    return math.pow(x, y)
+
 BINARY_OPS = [
     div,
     mul,
     add,
     sub,
+    exponent,
 ]
 
 CLAUSE_UNARY_OPS = [
     noop,
     floor,
     ceil,
-    #abso,
+    abso,
     #factorial
 ]
 

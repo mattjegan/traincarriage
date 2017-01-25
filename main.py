@@ -10,8 +10,8 @@ import itertools
 def main():
     stats = [0, 0]
     tfails = []
-    workers = 40
-    max_num = 1000
+    workers = 200
+    max_num = 10000
     with ProcessPoolExecutor(max_workers=workers) as executor:
         futures = []
         for i in range(0, workers):
@@ -26,7 +26,8 @@ def main():
             stats[False] += fstats[False]
     #stats = calcTrain(0, 1000)
     print('True:', stats[True], 'False:', stats[False])
-    print('Num Fails': len(fails))
+    print()
+    print(fails)
 
 def calcTrain(mini, maxi):
     fails = []
